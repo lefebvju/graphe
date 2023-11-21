@@ -20,10 +20,13 @@ public class DsaturGraphColoring {
 
     private Map<Integer,Integer> verticesColoring = new HashMap<>();
 
+    private Map<Integer,List<Integer>> neighbors = new HashMap<>();
+
     public DsaturGraphColoring(List<int[]> edges, int nbrVertices) {
         this.nbrVertices = nbrVertices;
         this.edges = edges;
         setSortedVertices();
+        setNeighbors();
         for(Integer vertex : sortedVerticesDeg) {
             dsaturVertices.put(vertex,0);
         }
@@ -45,7 +48,7 @@ public class DsaturGraphColoring {
         colors.add(1);
         int firstVertex = sortedVerticesDeg.get(0);
         verticesColoring.put(firstVertex,1);
-        for(Integer neighbor : getNeighbors(firstVertex)){
+        for(Integer neighbor : neighbors.get(firstVertex)){
             updateDSatur(neighbor);
         }
         while(verticesColoring.size()<nbrVertices) {
@@ -55,14 +58,12 @@ public class DsaturGraphColoring {
             int col = chooseValidColor(maxDegreeVertex);
             verticesColoring.put(maxDegreeVertex,col);
             sortedVerticesDeg.remove((Integer) maxDegreeVertex);
-            for(Integer neighbor : getNeighbors(firstVertex)){
+            for(Integer neighbor : neighbors.get(firstVertex)){
                 updateDSatur(neighbor);
             }
         }
         System.out.println(colors.size());
-        for(Integer vertex : verticesColoring.keySet()) {
-            System.out.println(vertex + " : "+verticesColoring.get(vertex));
-        }
+
 
 
     }
@@ -70,7 +71,7 @@ public class DsaturGraphColoring {
     public int chooseValidColor(int vertex) {
         for(Integer color : colors) {
             boolean valid = true;
-            for(Integer neighbor : getNeighbors(vertex)) {
+            for(Integer neighbor : neighbors.get(vertex)) {
                 if (verticesColoring.containsKey(neighbor) && verticesColoring.get(neighbor).equals(color)) {
                     valid = false;
                 }
@@ -140,6 +141,11 @@ public class DsaturGraphColoring {
         sortedVerticesDeg = sortedVertices;
     }
 
+    public void setNeighbors() {
+        for(Integer vertex : sortedVerticesDeg) {
+            neighbors.put(vertex,getNeighbors(vertex));
+        }
+    }
     public List<Integer> getNeighbors(int vertex) {
         List<Integer> neighbors = new ArrayList<>();
         for (int[] edge : edges) {
@@ -154,7 +160,7 @@ public class DsaturGraphColoring {
 
     public void updateDSatur(int vertex) {
         List<Integer> colors = new ArrayList<>();
-        List<Integer> neighbors = getNeighbors(vertex);
+        List<Integer> neighbors = this.neighbors.get(vertex);
         for(Integer neighbor : neighbors){
             if(verticesColoring.containsKey(neighbor) && !colors.contains(verticesColoring.get(neighbor))) {
                 colors.add(verticesColoring.get(neighbor));
