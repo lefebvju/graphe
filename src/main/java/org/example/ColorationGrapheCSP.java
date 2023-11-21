@@ -1,8 +1,14 @@
 package org.example;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.search.strategy.Search;
+import org.chocosolver.solver.search.strategy.selectors.variables.InputOrder;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.search.strategy.selectors.values.*;
+import org.chocosolver.solver.search.strategy.selectors.variables.*;
+import org.chocosolver.solver.variables.SetVar;
 
+import java.util.HashSet;
 import java.util.List;
 
 public class ColorationGrapheCSP {
@@ -27,17 +33,40 @@ public class ColorationGrapheCSP {
     }
 
     public boolean resolve(int nbCouleurs){
-        this.setNbCouleurs(nbCouleurs);
+        this.setNbCouleurs(this.nbSommets);
         // Créer un solveur
         this.solver = model.getSolver();
+        solver.limitTime(60000);
+
+        // Paramètres du solveur
+        //solver.setSearch(Search.domOverWDegSearch(couleur));
+        /*solver.setSearch(Search.intVarSearch(
+
+                // Stratégie de sélection des variables
+                new InputOrder<>(model),
+
+                // Stratégie de choix des valeurs pour les variables
+                new IntDomainMin(),
+
+                // Variables à considérer
+                couleur));*/
+
+        long startTime = System.currentTimeMillis();
+        boolean solved=this.solver.solve();
+        long endTime = System.currentTimeMillis();
+        long executionTime = endTime - startTime;
+        System.out.println(compteCouleur());
+        System.out.println("Le temps d'exécution de votreFonction est de : " + executionTime + " millisecondes");
+
+
         // Lancer la résolution
-        if (this.solver.solve()) {
+        if (solved) {
             /*for (int i = 0; i < this.nbSommets; i++) {
                 System.out.println("Sommet " + (i + 1) + " : Couleur " + this.couleur[i].getValue());
             }*/
             return true;
         } else {
-            //System.out.println("Pas de solution trouvée.");
+            System.out.println("Pas de solution trouvée.");
             return false;
         }
     }
@@ -68,6 +97,16 @@ public class ColorationGrapheCSP {
             int sommet2 = arete[1] - 1;
             this.model.arithm(couleur[sommet1], "!=", couleur[sommet2]).post();
         }
+    }
+
+    public int compteCouleur(){
+        HashSet<Integer> elementsUniques = new HashSet<>();
+
+        // Parcourir le tableau et ajouter chaque élément au HashSet
+        for (IntVar element : this.couleur) {
+            elementsUniques.add(element.getValue());
+        }
+        return elementsUniques.size();
     }
 }
 

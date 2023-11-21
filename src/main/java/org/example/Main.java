@@ -56,17 +56,8 @@ public class Main {
                     maxaretesname=nomFichier;
                 }
                 //grapheCSP.afficherAretes();
-                int nbCouleur=2;
-                while(!grapheCSP.resolve(nbCouleur)){
-                    nbCouleur++;
-                    System.out.println(nomFichier+" : "+nbCouleur);
-                    if(nbCouleur>5){
-                        nbCouleur=0;
-                        System.out.println("pas de solution");
-                        break;
-                    }
-                }
-                res.put(nomFichier,nbCouleur);
+                System.out.println(nomFichier);
+                grapheCSP.resolve(0);
             }
             System.out.println("min arrete "+minaretes+" "+minaretesname);
             System.out.println("max arrete "+maxaretes+" "+maxaretesname);
@@ -78,4 +69,5 @@ public class Main {
             System.out.println("Aucun fichier .col trouvé dans le répertoire.");
         }
     }
+
 }
