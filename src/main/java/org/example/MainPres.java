@@ -10,7 +10,6 @@ import org.chocosolver.solver.search.strategy.selectors.variables.*;
 public class MainPres {
     public static void main(String[] args) {
 
-
         // Créer un modèle
         Model model = new Model("Exemple");
 
