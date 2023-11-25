@@ -2,11 +2,14 @@ package org.example;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.search.strategy.Search;
+import org.chocosolver.solver.search.strategy.assignments.DecisionOperatorFactory;
+import org.chocosolver.solver.search.strategy.selectors.values.IntDomainMin;
+import org.chocosolver.solver.search.strategy.selectors.values.IntValueSelector;
+import org.chocosolver.solver.search.strategy.selectors.variables.FirstFail;
 import org.chocosolver.solver.search.strategy.selectors.variables.InputOrder;
+import org.chocosolver.solver.search.strategy.selectors.variables.VariableSelector;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.solver.search.strategy.selectors.values.*;
-import org.chocosolver.solver.search.strategy.selectors.variables.*;
-import org.chocosolver.solver.variables.SetVar;
+import org.chocosolver.solver.variables.RealVar;
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,24 +35,64 @@ public class ColorationGrapheCSP {
         this.aretes = aretes;
     }
 
-    public boolean resolve(int nbCouleurs){
-        this.setNbCouleurs(this.nbSommets);
+    public String resolve(){
+        this.model = new Model("Coloration de graphe en CSP");
+        this.couleur = model.intVarArray("couleur", this.nbSommets, 1, this.nbSommets);
+        int[] degrees = new int[this.nbSommets];
+        for (int[] arete : aretes) {
+            int sommet1 = arete[0] - 1;
+            int sommet2 = arete[1] - 1;
+            this.model.arithm(couleur[sommet1], "!=", couleur[sommet2]).post();
+            degrees[arete[0] - 1]++;
+            degrees[arete[1] - 1]++;
+        }
         // Créer un solveur
         this.solver = model.getSolver();
         solver.limitTime(60000);
+        switch (Main.technique) {
+            case 0:
+                solver.setSearch(Search.domOverWDegSearch(couleur));
+                break;
+            case 1:
+                solver.setSearch(Search.intVarSearch(
 
-        // Paramètres du solveur
-        //solver.setSearch(Search.domOverWDegSearch(couleur));
-        /*solver.setSearch(Search.intVarSearch(
+                        // Stratégie de sélection des variables
+                        new InputOrder<>(model),
 
-                // Stratégie de sélection des variables
-                new InputOrder<>(model),
+                        // Stratégie de choix des valeurs pour les variables
+                        new IntDomainMin(),
 
-                // Stratégie de choix des valeurs pour les variables
-                new IntDomainMin(),
-
-                // Variables à considérer
-                couleur));*/
+                        // Variables à considérer
+                        couleur));
+                break;
+            case 2:
+                solver.setSearch(Search.intVarSearch(
+                        (VariableSelector<IntVar>) variables -> {
+                            for (IntVar v : variables) {
+                                if (!v.isInstantiated()) {
+                                    return v;
+                                }
+                            }
+                            return null;
+                        },
+                        // value selector
+                        (IntValueSelector) var -> var.getLB(),
+                        couleur
+                ));
+                break;
+            case 3:
+                solver.setSearch(Search.intVarSearch(
+                        // selects the variable of smallest domain size
+                        new FirstFail(model),
+                        // selects the smallest domain value (lower bound)
+                        new IntDomainMin(),
+                        // apply equality (var = val)
+                        DecisionOperatorFactory.makeIntEq(),
+                        // variables to branch on
+                        couleur
+                ));
+                break;
+        }
 
         long startTime = System.currentTimeMillis();
         boolean solved=this.solver.solve();
@@ -64,10 +107,10 @@ public class ColorationGrapheCSP {
             /*for (int i = 0; i < this.nbSommets; i++) {
                 System.out.println("Sommet " + (i + 1) + " : Couleur " + this.couleur[i].getValue());
             }*/
-            return true;
+            return executionTime+","+compteCouleur();//+";"+getNbSommets()+";"+getAretes().size();
         } else {
             System.out.println("Pas de solution trouvée.");
-            return false;
+            return executionTime+","+compteCouleur();//+";"+getNbSommets()+";"+getAretes().size();
         }
     }
     public void afficherAretes() {
@@ -84,21 +127,6 @@ public class ColorationGrapheCSP {
         this.nbSommets = nbSommets;
     }
 
-    public int getNbCouleurs() {
-        return nbCouleurs;
-    }
-
-    private void setNbCouleurs(int nbCouleurs) {
-        this.model = new Model("Coloration de graphe en CSP");
-        this.nbCouleurs = nbCouleurs;
-        this.couleur = model.intVarArray("couleur", this.nbSommets, 1, this.nbCouleurs);
-        for (int[] arete : aretes) {
-            int sommet1 = arete[0] - 1;
-            int sommet2 = arete[1] - 1;
-            this.model.arithm(couleur[sommet1], "!=", couleur[sommet2]).post();
-        }
-    }
-
     public int compteCouleur(){
         HashSet<Integer> elementsUniques = new HashSet<>();
 
@@ -106,6 +134,7 @@ public class ColorationGrapheCSP {
         for (IntVar element : this.couleur) {
             elementsUniques.add(element.getValue());
         }
+
         return elementsUniques.size();
     }
 }
