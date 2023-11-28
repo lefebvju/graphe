@@ -1,7 +1,6 @@
 package org.example;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,31 +25,36 @@ public class MainDsatur {
 
         if (fichiersCOL != null) {
             System.out.println("Fichiers se terminant par .col :");
-            Map<String,Integer> res= new HashMap<String, Integer>();
-            int minpoints=Integer.MAX_VALUE;
-            int maxpoints=-1;
-            int minaretes=Integer.MAX_VALUE;
-            int maxaretes=-1;
-            int nbFichiers=0;
-            String minpointsname="";
-            String maxpointsname="";
-            String minaretesname="";
-            String maxaretesname="";
+            Map<String,String> res= new HashMap<String, String>();
             for (String nomFichier : fichiersCOL) {
-                nbFichiers++;
                 DsaturGraphColoring dsatur = lireFichierCol(cheminDuRepertoire+"/"+nomFichier);
                 System.out.println(nomFichier);
-                dsatur.solve();
+                long startTime = System.currentTimeMillis();
+                int color=dsatur.solve();
+                long endTime = System.currentTimeMillis();
+                long executionTime = endTime - startTime;
+                System.out.println("Le temps d'exécution de votreFonction est de : " + executionTime + " millisecondes");
+                res.put(nomFichier,executionTime+","+color);
             }
-            System.out.println("min arrete "+minaretes+" "+minaretesname);
-            System.out.println("max arrete "+maxaretes+" "+maxaretesname);
-            System.out.println("min point "+minpoints+" "+minpointsname);
-            System.out.println("max points "+maxpoints+" "+maxpointsname);
-            System.out.println(nbFichiers+" fichier lu");
             System.out.println(res);
+            printResult(res);
         } else {
             System.out.println("Aucun fichier .col trouvé dans le répertoire.");
         }
+    }
+    public static void printResult(Map<String,String> res){
+        // écrire dans un fichier csv
+        String csvFile = "DSATUR"+".csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+            // Écriture du texte dans le fichier
+            for (Map.Entry<String, String> entry : res.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                writer.write(key + "," + value+"\n");
+            }
+        } catch (IOException e) {
+        }
+
     }
 
 }

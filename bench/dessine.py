@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 # Remplacez "nom_fichier.col" par le nom de votre fichier .col
-nom_fichier = "huck.col"
+nom_fichier = "homer.col"
 
 # Lecture du fichier .col
 with open(nom_fichier, 'r') as fichier:
@@ -19,9 +19,6 @@ for ligne in lignes:
 # Création d'un graphe non orienté
 graphe = nx.Graph()
 
-# Ajout des sommets au graphe
-for i in range(1, nombre_sommets + 1):
-    graphe.add_node(i)
 
 # Ajout des arêtes au graphe
 for ligne in lignes:

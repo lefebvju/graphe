@@ -19,6 +19,9 @@ public class fileReaderDsatur {
                     String[] parties = ligne.split(" ");
                     int vertex1 = Integer.parseInt(parties[1]);
                     int vertex2 = Integer.parseInt(parties[2]);
+                    if(vertex1 == vertex2){
+                        System.out.println("Erreur : boucle sur le sommet "+vertex1);
+                    }
                     edges.add(new int[]{vertex1, vertex2});
                 } else if (ligne.startsWith("p edge")) {
                     nbVertices = Integer.parseInt(ligne.split(" ")[2]);

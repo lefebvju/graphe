@@ -5,9 +5,7 @@ import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.search.strategy.assignments.DecisionOperatorFactory;
 import org.chocosolver.solver.search.strategy.selectors.values.IntDomainMin;
 import org.chocosolver.solver.search.strategy.selectors.values.IntValueSelector;
-import org.chocosolver.solver.search.strategy.selectors.variables.FirstFail;
-import org.chocosolver.solver.search.strategy.selectors.variables.InputOrder;
-import org.chocosolver.solver.search.strategy.selectors.variables.VariableSelector;
+import org.chocosolver.solver.search.strategy.selectors.variables.*;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 
@@ -48,7 +46,6 @@ public class ColorationGrapheCSP {
         }
         // Créer un solveur
         this.solver = model.getSolver();
-        solver.limitTime(60000);
         switch (Main.technique) {
             case 0:
                 solver.setSearch(Search.domOverWDegSearch(couleur));
@@ -66,19 +63,7 @@ public class ColorationGrapheCSP {
                         couleur));
                 break;
             case 2:
-                solver.setSearch(Search.intVarSearch(
-                        (VariableSelector<IntVar>) variables -> {
-                            for (IntVar v : variables) {
-                                if (!v.isInstantiated()) {
-                                    return v;
-                                }
-                            }
-                            return null;
-                        },
-                        // value selector
-                        (IntValueSelector) var -> var.getLB(),
-                        couleur
-                ));
+                solver.setSearch(Search.activityBasedSearch(couleur));
                 break;
             case 3:
                 solver.setSearch(Search.intVarSearch(
@@ -86,8 +71,6 @@ public class ColorationGrapheCSP {
                         new FirstFail(model),
                         // selects the smallest domain value (lower bound)
                         new IntDomainMin(),
-                        // apply equality (var = val)
-                        DecisionOperatorFactory.makeIntEq(),
                         // variables to branch on
                         couleur
                 ));
@@ -95,7 +78,10 @@ public class ColorationGrapheCSP {
         }
 
         long startTime = System.currentTimeMillis();
-        boolean solved=this.solver.solve();
+        while(this.solver.solve()){
+            System.out.println(compteCouleur());
+        }
+
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;
         System.out.println(compteCouleur());
@@ -103,7 +89,7 @@ public class ColorationGrapheCSP {
 
 
         // Lancer la résolution
-        if (solved) {
+        if (true) {
             /*for (int i = 0; i < this.nbSommets; i++) {
                 System.out.println("Sommet " + (i + 1) + " : Couleur " + this.couleur[i].getValue());
             }*/

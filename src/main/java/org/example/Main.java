@@ -8,7 +8,7 @@ import java.util.Map;
 import static org.example.LectureFichierCol.lireFichierCol;
 
 public class Main {
-    public static int technique = 3;
+    public static int technique = -1;
     public static void main(String[] args) {
         String cheminDuRepertoire = "bench";
         File repertoire = new File(cheminDuRepertoire);
@@ -17,7 +17,7 @@ public class Main {
         FilenameFilter filtre = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String nom) {
-                return nom.toLowerCase().endsWith(".col");
+                return nom.toLowerCase().endsWith("nsh.col");
             }
         };
 

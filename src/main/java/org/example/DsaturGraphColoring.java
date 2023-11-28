@@ -44,7 +44,7 @@ public class DsaturGraphColoring {
 
     }
 
-    public void solve() {
+    public int solve() {
         colors.add(1);
         int firstVertex = sortedVerticesDeg.get(0);
         verticesColoring.put(firstVertex,1);
@@ -63,6 +63,7 @@ public class DsaturGraphColoring {
             }
         }
         System.out.println(colors.size());
+        return colors.size();
 
 
 
