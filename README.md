@@ -23,3 +23,6 @@ Le changement de la valeur de l'attribut technique dans le fichier change l'heur
 ## Fichiers python :
 * Fichier dans le dossier bench : Permet de visualiser les graphs
 * Fichier à la racine du projet : Permet de comparer les résultats obtenus via la méthode complète et incomplète pour trouver les cas dans lesquels la deuxième méthode est meilleure.
+
+## PDF de la présentation :
+- Vous trouverez le PowerPoint de la présentation dans le fichier presentation_Conrad_Lefebvre.pdf
