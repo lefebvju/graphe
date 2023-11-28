@@ -46,6 +46,7 @@ public class ColorationGrapheCSP {
         }
         // Créer un solveur
         this.solver = model.getSolver();
+        solver.limitTime(60000);
         switch (Main.technique) {
             case 0:
                 solver.setSearch(Search.domOverWDegSearch(couleur));
@@ -77,14 +78,20 @@ public class ColorationGrapheCSP {
                 break;
         }
 
+        IntVar maxCouleur = model.intVar("maxCouleur", 1, nbSommets);
+        model.max(maxCouleur, couleur).post();
+        model.setObjective(Model.MINIMIZE, maxCouleur);
+
         long startTime = System.currentTimeMillis();
+        long endTime = 0;
+        long executionTime = 0;
         while(this.solver.solve()){
-            System.out.println(compteCouleur());
+            System.out.println(maxCouleur);
+            endTime = System.currentTimeMillis();
+            executionTime = endTime - startTime;
+            System.out.println("Temps d'execution : " + executionTime + " ms");
         }
 
-        long endTime = System.currentTimeMillis();
-        long executionTime = endTime - startTime;
-        System.out.println(compteCouleur());
         System.out.println("Le temps d'exécution de votreFonction est de : " + executionTime + " millisecondes");
 
 
