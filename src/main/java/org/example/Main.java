@@ -10,6 +10,13 @@ import static org.example.LectureFichierCol.lireFichierCol;
 public class Main {
     public static int technique = 3;
     public static void main(String[] args) {
+        for (int i = 0; i < 2; i++) {
+            technique = i;
+            execute();
+        }
+    }
+
+    public static void execute(){
         String cheminDuRepertoire = "bench";
         File repertoire = new File(cheminDuRepertoire);
 
@@ -17,7 +24,7 @@ public class Main {
         FilenameFilter filtre = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String nom) {
-                return nom.toLowerCase().endsWith("000.9.col");
+                return nom.toLowerCase().endsWith(".col");
             }
         };
 
@@ -39,10 +46,9 @@ public class Main {
             System.out.println("Aucun fichier .col trouvé dans le répertoire.");
         }
     }
-
     public static void printResult(Map<String,String> res){
         // écrire dans un fichier csv
-        String csvFile = "CSP"+technique+".csv";
+        String csvFile = "CSP_Technique"+technique+".csv";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
             // Écriture du texte dans le fichier
             for (Map.Entry<String, String> entry : res.entrySet()) {
