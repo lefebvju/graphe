@@ -17,7 +17,7 @@ public class Main {
         FilenameFilter filtre = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String nom) {
-                return nom.toLowerCase().endsWith("nsh.col");
+                return nom.toLowerCase().endsWith("000.9.col");
             }
         };
 
